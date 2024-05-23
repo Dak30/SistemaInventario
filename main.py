@@ -79,6 +79,14 @@ def agregar_categoria(nombre, descripcion):
     conn.commit()
     conn.close()
 
+def eliminar_categoria(nombre):
+    conn = sqlite3.connect('GestionInventario.db')
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM Categoria WHERE nombre = ?", (nombre,))
+    conn.commit()
+    conn.close()
+    console.print("[bold green]Categoria eliminado exitosamente.[/bold green]")    
+
 def agregar_proveedor(nombre, direccion, telefono, productos):
     conn = sqlite3.connect('GestionInventario.db')
     cursor = conn.cursor()
@@ -280,14 +288,14 @@ def retirar_producto_de_bodega(producto_nombre, cantidad):
     conn.close()
     console.print("[bold green]Producto retirado de la bodega exitosamente.[/bold green]")
 
-def consultar_disponibilidad_producto_bodega(producto_nombre, bodega_id):
+def consultar_disponibilidad_producto_bodega(producto_nombre):
     conn = sqlite3.connect('GestionInventario.db')
     cursor = conn.cursor()
     cursor.execute('''
     SELECT p.id, p.nombre, p.descripcion, p.precio, p.stock
     FROM Producto p
-    WHERE p.nombre = ? AND p.bodega_id = ?
-    ''', (producto_nombre, bodega_id))
+    WHERE p.nombre = ?
+    ''', (producto_nombre,))
     producto = cursor.fetchone()
     conn.close()
     if producto:
@@ -309,9 +317,11 @@ def listar_productos():
     productos = cursor.fetchall()
     conn.close()
     if productos:
+        console.print("\n[bold blue]PRODUCTOS[/bold blue]\n")
         table = tabulate(productos, headers=['ID', 'Nombre', 'Descripción', 'Precio', 'Stock', 'Categoría', 'Proveedor', 'Bodega'], tablefmt='fancy_grid')
         console.print(table)
     else:
+        console.print("\n[bold blue]PRODUCTOS[/bold blue]\n")
         console.print("[bold red]No hay productos registrados.[/bold red]")
 
 def listar_categorias():
@@ -321,9 +331,11 @@ def listar_categorias():
     categorias = cursor.fetchall()
     conn.close()
     if categorias:
+        console.print("\n[bold blue]CATEGORÍAS[/bold blue]\n")
         table = tabulate(categorias, headers=['ID', 'Nombre', 'Descripción'], tablefmt='fancy_grid')
         console.print(table)
     else:
+        console.print("\n[bold blue]CATEGORÍAS[/bold blue]\n")
         console.print("[bold red]No hay categorías registradas.[/bold red]")
 
 def listar_proveedores():
@@ -333,9 +345,11 @@ def listar_proveedores():
     proveedores = cursor.fetchall()
     conn.close()
     if proveedores:
+        console.print("\n[bold blue]PROVEEDORES[/bold blue]\n")
         table = tabulate(proveedores, headers=['ID', 'Nombre', 'Dirección', 'Teléfono'], tablefmt='fancy_grid')
         console.print(table)
     else:
+        console.print("\n[bold blue]PROVEEDORES[/bold blue]\n")
         console.print("[bold red]No hay proveedores registrados.[/bold red]")
 
 def listar_bodegas():
@@ -344,10 +358,14 @@ def listar_bodegas():
     cursor.execute('SELECT id, nombre, ubicacion, capacidad_maxima FROM Bodega')
     bodegas = cursor.fetchall()
     conn.close()
+    console = Console()
     if bodegas:
-        table = tabulate(bodegas, headers=['ID', 'Nombre', 'Ubicación', 'Capacidad Máxima'], tablefmt='fancy_grid')
+        # Formatear y mostrar la tabla de datos de bodegas centrada
+        console.print("\n[bold blue]BODEGAS[/bold blue]\n")
+        table = tabulate(bodegas, headers=['ID', 'Nombre', 'Ubicación', 'Capacidad Máxima'], tablefmt='fancy_grid', stralign='center', numalign='center')
         console.print(table)
     else:
+        console.print("\n[bold blue]BODEGAS[/bold blue]\n")
         console.print("[bold red]No hay bodegas registradas.[/bold red]")
 
 def informe_stock_total():
@@ -405,16 +423,16 @@ def menu():
         console.print("[green]2.[/green] Agregar Proveedor")
         console.print("[green]3.[/green] Agregar Bodega")
         console.print("[green]4.[/green] Agregar Producto")
-        console.print("[green]5.[/green] Eliminar Producto")
+        console.print("[red]5.[/red] Eliminar Producto")
         console.print("[bold]Gestion de Stock[/bold]")
         console.print("[green]6.[/green] Agregar Stock")
         console.print("[green]7.[/green] Retirar Stock")
         console.print("[green]8.[/green] Calcular el valor total del stock")
         console.print("[bold]Agregar o Eliminar los datos para Inventario[/bold]")
         console.print("[green]9.[/green] Agregar Producto a Categoría")
-        console.print("[green]10.[/green] Eliminar Producto de Categoría")
+        console.print("[red]10.[/red] Eliminar Producto de Categoría")
         console.print("[green]11.[/green] Agregar Producto a Proveedor")
-        console.print("[green]12.[/green] Eliminar Producto de Proveedor")
+        console.print("[red]12.[/red] Eliminar Producto de Proveedor")
         console.print("[green]13.[/green] Agregar Producto a Bodega")
         console.print("[green]14.[/green] Retirar Producto de Bodega")
         console.print("[green]15.[/green] Consultar Disponibilidad de Producto en Bodega")
@@ -424,12 +442,14 @@ def menu():
         console.print("[green]18.[/green] Consultar Proveedor")
         console.print("[green]19.[/green] Consultar Bodega")
         console.print("[green]20.[/green] Informe de Stock")
-        console.print("[green]21.[/green] Listar Productos")
-        console.print("[green]22.[/green] Listar Categorías")
-        console.print("[green]23.[/green] Listar Proveedores")
-        console.print("[green]24.[/green] Listar Bodegas")
-        console.print("[green]25.[/green] Eliminar Todos los Datos")
-        console.print("[green]26.[/green] Salir")
+        console.print("[bold]Digite el numero de las listas[/bold]")
+        console.print("[green]21.[/green] Listas Productos")
+        console.print("[green]22.[/green] Listas Categorías")
+        console.print("[green]23.[/green] Listas Proveedores")
+        console.print("[green]24.[/green] Listas Bodegas")
+        console.print("[red]25.[/red] Eliminar Todos los Datos")
+        console.print("[red]26.[/red] Eliminar Categoria ")
+        console.print("[green]27.[/green] Salir")
 
         opcion = input("Seleccione una opción: ")
 
@@ -513,8 +533,7 @@ def menu():
 
         elif opcion == '15':
             producto_nombre = input("Ingrese el nombre del producto a consultar en la bodega: ")
-            bodega_id = int(input("Ingrese el ID de la bodega: "))
-            consultar_disponibilidad_producto_bodega(producto_nombre, bodega_id)
+            consultar_disponibilidad_producto_bodega(producto_nombre)
 
         elif opcion == '16':
             nombre = input("Ingrese el nombre del producto a consultar: ")
@@ -532,29 +551,37 @@ def menu():
             nombre = input("Ingrese el nombre de la bodega a consultar: ")
             consultar_bodega(nombre)
 
-        elif opcion == '20':
+        if opcion == '20':
             console.print("Seleccione el tipo de informe de stock:", style="bold yellow")
             console.print("[green]1.[/green] Stock Total")
             console.print("[green]2.[/green] Stock por Categoría")
             console.print("[green]3.[/green] Stock por Proveedor")
             console.print("[green]4.[/green] Stock por Bodega")
 
-            tipo_informe = input("Seleccione una opción: ", )
+            tipo_informe = input("Seleccione una opción: ")
 
             if tipo_informe == '1':
-                console.print("Stock total:", informe_stock_total())
+                console.print("Stock total:", style="bold green")
+                console.print(informe_stock_total(), style="bold white")
+
             elif tipo_informe == '2':
                 informe = informe_stock_por_categoria()
-                for categoria, stock in informe:
-                    console.print(f"{categoria}: {stock}")
+                headers = ["Categoría", "Stock"]
+                table = tabulate(informe, headers, tablefmt="fancy_grid")
+                console.print(table)
+
             elif tipo_informe == '3':
                 informe = informe_stock_por_proveedor()
-                for proveedor, stock in informe:
-                    console.print(f"{proveedor}: {stock}")
+                headers = ["Proveedor", "Stock"]
+                table = tabulate(informe, headers, tablefmt="fancy_grid")
+                console.print(table)
+
             elif tipo_informe == '4':
                 informe = informe_stock_por_bodega()
-                for bodega, stock in informe:
-                    console.print(f"{bodega}: {stock}")
+                headers = ["Bodega", "Stock"]
+                table = tabulate(informe, headers, tablefmt="fancy_grid")
+                console.print(table)
+
             else:
                 console.print("Opción no válida.", style="bold red")
 
@@ -583,11 +610,17 @@ def menu():
                 conn.close()
                 console.print("[bold green]Todos los datos han sido eliminados exitosamente.[/bold green]")
 
+
         elif opcion == '26':
+            nombre = input("Ingrese el nombre del categoria a eliminar: ")
+            eliminar_categoria(nombre)
+
+        elif opcion == '27':
             console.print("[bold green]Saliendo del sistema...[/bold green]")
             break
 
         else:
-            console.print("[bold red]Opción no válida. Por favor, seleccione una opción del menú.[/bold red]")
+            console.print("")
+            console.print("[bold red]Opcion no valida. Por favor, seleccione una opción del menú.[/bold red]")
 
 menu()
